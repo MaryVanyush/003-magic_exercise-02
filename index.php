@@ -1,26 +1,18 @@
 <?php
 declare(strict_types=1);
 
+trait UserAuthentication {
+    private $credentials = [
+        'app' => ['username' => 'appUser', 'password' => 'appPass'],
+        'mobile' => ['username' => 'mobileUser', 'password' => 'mobilePass'],
+    ];
 
-trait AppUserAuthentication {
-    private $appUsername = 'appUser';
-    private $appPassword = 'appPass';
+    public function authenticate($type, $username, $password) {
+        if (!isset($this->credentials[$type])) {
+            return "Неизвестный тип пользователя.";
+        }
 
-    public function authenticateApp($username, $password) {
-        if ($username === $this->appUsername && $password === $this->appPassword) {
-            return "Пользователь авторизован!";
-        } else{
-            return "Ошибка авторизации.";
-        } 
-    }
-}
-
-trait MobileUserAuthentication {
-    private $mobileUsername = 'mobileUser';
-    private $mobilePassword = 'mobilePass';
-
-    public function authenticateMob($username, $password) {
-        if ($username === $this->mobileUsername && $password === $this->mobilePassword) {
+        if ($username === $this->credentials[$type]['username'] && $password === $this->credentials[$type]['password']) {
             return "Пользователь авторизован!";
         } else {
             return "Ошибка авторизации.";
@@ -29,20 +21,14 @@ trait MobileUserAuthentication {
 }
 
 class User {
-    use AppUserAuthentication;
-    use MobileUserAuthentication;
+    use UserAuthentication;
 
     public function login($type, $username, $password) {
-        if ($type === 'app') {
-            return $this->authenticateApp($username, $password);
-        } elseif ($type === 'mobile') {
-            return $this->authenticateMob($username, $password);
-        } else {
-            return "Неизвестный тип пользователя.";
-        }
+        return $this->authenticate($type, $username, $password);
     }
 }
 
 $user = new User();
 echo $user->login('app', 'appUser', 'appPass') . "\n";
 echo $user->login('mobile', 'mobileUser', 'mobilePass') . "\n";
+echo $user->login('web', 'webUser', 'webPass') . "\n";
